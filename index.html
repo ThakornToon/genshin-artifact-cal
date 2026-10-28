@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Artifact Calculator – Genshin Impact</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f2ee;--sf:#fff;--in:#f4f2ee;--ink:#1f2330;--mu:#667085;--ln:#dedad0;--ac:#b07a1c;--ac2:#2b6c8c;--g0:#c0584a;--g1:#d09a2c;--g2:#5f9e45;--g3:#2b8f9d;--g4:#7b5cd6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171f;--sf:#1e222d;--in:#14171f;--ink:#ece8dc;--mu:#9aa0b2;--ln:#363b4a;--ac:#e3b862;--ac2:#78bbd9;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14171f;--sf:#1e222d;--in:#14171f;--ink:#ece8dc;--mu:#9aa0b2;--ln:#363b4a;--ac:#e3b862;--ac2:#78bbd9;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "Noto Sans Thai",system-ui,sans-serif}
+header{background:linear-gradient(135deg,#27305c,#2b6c8c);color:#fff;padding:22px 16px 18px}
+.w{max-width:880px;margin:0 auto}
+header .w{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+h1{font-size:23px;margin:0 0 2px;line-height:1.3}
+header p{margin:0;opacity:.85;font-size:13px}
+.lang{display:flex;border:1px solid rgba(255,255,255,.5);border-radius:20px;overflow:hidden;flex-shrink:0}
+.lang button{background:none;border:0;color:#fff;padding:5px 12px;cursor:pointer;font:inherit;font-size:13px}
+.lang button.on{background:#fff;color:#27305c;font-weight:700}
+.tabs{display:flex;gap:4px;padding:10px 14px 0;max-width:880px;margin:0 auto}
+.tab{flex:1;padding:10px 6px;border:0;border-bottom:3px solid transparent;background:none;cursor:pointer;font:inherit;font-weight:600;color:var(--mu)}
+.tab.on{color:var(--ac);border-color:var(--ac)}
+main{max-width:880px;margin:0 auto;padding:12px 14px 44px}
+button,select{font:inherit;color:var(--ink)}
+.box{background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:14px;margin-bottom:12px}
+.box h2{font-size:16px;margin:0 0 8px}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{padding:6px 12px;border:1px solid var(--ln);border-radius:20px;background:var(--in);cursor:pointer}
+.chip.on{border-color:var(--ac);background:var(--ac);color:#fff}
+.chip[disabled]{opacity:.35;cursor:not-allowed}
+select{padding:6px 8px;border:1px solid var(--ln);border-radius:8px;background:var(--in);max-width:100%}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.sb{border:1px solid var(--ln);border-radius:12px;padding:11px;background:var(--in)}
+.sb.use{border-color:var(--ac2);box-shadow:inset 4px 0 0 var(--ac2)}
+.big{font-size:21px;font-weight:700;color:var(--ac)}
+.mu{color:var(--mu);font-size:13px}
+.rolls{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.rolls select{font-size:13px;padding:3px}
+.sm{padding:4px 11px;border:1px solid var(--ln);border-radius:8px;background:var(--sf);cursor:pointer}
+.sm[disabled]{opacity:.4;cursor:not-allowed}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:6px 4px;border-bottom:1px solid var(--ln);text-align:left}th{color:var(--mu);font-weight:600;font-size:13px}td:last-child,th:last-child{text-align:right}
+.tw{overflow-x:auto}
+.res{font-size:28px;font-weight:700;color:var(--ac)}
+.bar{height:12px;border-radius:6px;background:var(--ln);overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;border-radius:6px}
+.badge{display:inline-block;padding:2px 12px;border-radius:14px;color:#fff;font-weight:700}
+.tip{background:var(--in);border-radius:10px;padding:9px 11px;font-size:13.5px;color:var(--mu);margin-top:8px}
+.guide h3{font-size:15px;margin:14px 0 4px;color:var(--ac2)}
+.guide p,.guide li{margin:4px 0}
+.guide code{background:var(--in);padding:1px 6px;border-radius:6px;font-size:13px}
+.fm{background:var(--in);border-left:4px solid var(--ac);padding:8px 12px;border-radius:6px;margin:8px 0;font-size:14px}
+label{cursor:pointer}
+</style>
+</head>
+<body>
+<header><div class="w"><div><h1 id="h1"></h1><p id="hp"></p></div>
+<div class="lang"><button id="lth" onclick="setLang(0)">ไทย</button><button id="len" onclick="setLang(1)">EN</button></div></div></header>
+<nav class="tabs"><button class="tab" id="t0" onclick="tab(0)"></button><button class="tab" id="t1" onclick="tab(1)"></button><button class="tab" id="t2" onclick="tab(2)"></button></nav>
+<main><div id="p0"></div><div id="p1" hidden></div><div id="p2" class="guide" hidden></div></main>
+<script>
+const $=s=>document.querySelector(s);
+let LI=0,TB=0;try{LI=localStorage.getItem('lang')==='en'?1:0}catch(e){}
+const x=a=>a[LI];
+const S={hp:{n:'HP',t:[209.13,239,268.88,298.75],w:150,d:['HP แบบตัวเลข เพิ่มเล็กน้อย คุ้มน้อยกว่า HP% ยกเว้นตัวละครที่ใช้ HP','Flat HP. A small bonus; weaker than HP% unless a character scales off HP.']},
+atk:{n:'ATK',t:[13.62,15.56,17.51,19.45],w:150,d:['ATK แบบตัวเลข เพิ่มดาเมจเล็กน้อย มักไม่ใช่ค่าหลักที่ต้องการ','Flat ATK. A small damage bonus; usually not a priority stat.']},
+def:{n:'DEF',t:[16.2,18.52,20.83,23.15],w:150,d:['DEF แบบตัวเลข ใช้กับตัวละครสายป้องกันเท่านั้น ปกติไม่จำเป็น','Flat DEF. Only matters for defensive builds; usually skippable.']},
+hpp:{n:'HP%',p:1,t:[4.08,4.66,5.25,5.83],w:100,d:['HP เป็นเปอร์เซ็นต์ เหมาะกับตัวละครสายฮีล/โล่ หรือดาเมจที่อิง HP','HP percentage. Good for healers, shielders and HP-scaling damage.']},
+atkp:{n:'ATK%',p:1,t:[4.08,4.66,5.25,5.83],w:100,d:['ATK เป็นเปอร์เซ็นต์ เพิ่มดาเมจของตัวละครที่ใช้ ATK ใช้ได้กว้างที่สุด','ATK percentage. Raises damage for ATK-scaling characters; broadly useful.']},
+defp:{n:'DEF%',p:1,t:[5.1,5.83,6.56,7.29],w:100,d:['DEF เป็นเปอร์เซ็นต์ จำเป็นกับตัวละครที่ดาเมจอิง DEF เช่น Itto, Noelle','DEF percentage. Needed for DEF-scaling characters such as Itto or Noelle.']},
+er:{n:'Energy Recharge',p:1,t:[4.53,5.18,5.83,6.48],w:100,d:['เพิ่มพลังงานต่อครั้ง ทำให้ใช้สกิลระเบิดได้ถี่ขึ้น สำคัญกับซัพพอร์ตและสายระเบิด','Generates more energy so the Burst is ready sooner. Key for supports and Burst-focused characters.']},
+em:{n:'Elemental Mastery',t:[16.32,18.65,20.98,23.31],w:100,d:['เพิ่มดาเมจและผลของปฏิกิริยาธาตุ (Vaporize, Melt, Bloom ฯลฯ)','Boosts the damage and effect of elemental reactions (Vaporize, Melt, Bloom, etc.).']},
+cr:{n:'CRIT Rate',p:1,t:[2.72,3.11,3.5,3.89],w:75,d:['โอกาสติดคริติคอล อัตราส่วนยอดนิยมคือ CR : CD ≈ 1 : 2','Chance to land a critical hit. A popular target is CR : CD of about 1 : 2.']},
+cd:{n:'CRIT DMG',p:1,t:[5.44,6.22,6.99,7.77],w:75,d:['ดาเมจเพิ่มเมื่อติดคริติคอล (ค่าพื้นฐาน 50%) ยิ่งสูงยิ่งแรงเมื่อคริออก','Extra damage when a crit lands (base 50%). Higher means bigger crits.']}};
+const SK=Object.keys(S);
+const M={hp:['HP','4,780'],atk:['ATK','311'],hpp:['HP%','46.6%'],atkp:['ATK%','46.6%'],defp:['DEF%','58.3%'],er:['Energy Recharge','51.8%'],em:['Elemental Mastery','187'],cr:['CRIT Rate','31.1%'],cd:['CRIT DMG','62.2%'],heal:['Healing Bonus','35.9%'],phys:['Physical DMG%','58.3%'],pyro:['Pyro DMG%','46.6%'],hydro:['Hydro DMG%','46.6%'],electro:['Electro DMG%','46.6%'],cryo:['Cryo DMG%','46.6%'],anemo:['Anemo DMG%','46.6%'],geo:['Geo DMG%','46.6%'],dendro:['Dendro DMG%','46.6%']};
+const el={pyro:5,hydro:5,electro:5,cryo:5,anemo:5,geo:5,dendro:5,phys:5};
+const T={flower:{n:['ดอกไม้','Flower'],m:{hp:100}},plume:{n:['ขนนก','Plume'],m:{atk:100}},
+sands:{n:['นาฬิกา','Sands'],m:{hpp:26.68,atkp:26.66,defp:26.66,er:10,em:10}},
+goblet:{n:['ถ้วย','Goblet'],m:{hpp:19.25,atkp:19.25,defp:19,...el,em:2.5}},
+circlet:{n:['มงกุฎ','Circlet'],m:{hpp:22,atkp:22,defp:22,cr:10,cd:10,heal:10,em:4}}};
+const GR=[['ต่ำ','Weak','--g0'],['พอใช้','Decent','--g1'],['ดี','Good','--g2'],['ดีมาก','Great','--g3'],['ยอดเยี่ยม','Excellent','--g4']];
+const rvG=v=>v<150?0:v<250?1:v<350?2:v<450?3:4, cvG=v=>v<20?0:v<30?1:v<40?2:v<50?3:4;
+const fmt=(k,v)=>S[k].p?v.toFixed(1)+'%':Math.round(v).toLocaleString();
+const avg=k=>S[k].t.reduce((a,b)=>a+b)/4, val=(k,i)=>i===4?avg(k):S[k].t[i];
+const badge=g=>`<span class="badge" style="background:var(${GR[g][2]})">${x(GR[g])}</span>`;
+const pct=p=>p===0?'0%':(p*100>=1?(p*100).toFixed(2):(p*100).toPrecision(3))+'%';
+const one=p=>p>0?x(['1 ใน ','1 in '])+Math.round(1/p).toLocaleString():'—';
+const half=p=>p>0&&p<1?Math.ceil(Math.log(.5)/Math.log(1-p)).toLocaleString():'—';
+
+/* ---- state ---- */
+const st={type:'sands',main:'hpp',full:true,subs:[],used:new Set(['cr','cd','atkp'])};
+const maxUp=()=>st.full?5:4, totalUp=()=>st.subs.reduce((a,s)=>a+s.rolls.length,0);
+function fix(){const u=new Set([st.main]);st.subs.forEach(s=>{if(u.has(s.key)){const n=SK.find(k=>!u.has(k)&&!st.subs.some(o=>o!==s&&o.key===k));if(n)s.key=n}u.add(s.key)});
+let ex=totalUp()-maxUp();for(let i=3;i>=0&&ex>0;i--)while(st.subs[i].rolls.length&&ex>0){st.subs[i].rolls.pop();ex--}}
+st.subs=SK.filter(k=>k!=='hpp').slice(0,4).map(k=>({key:k,init:2,rolls:[]}));st.subs[0].rolls=[4];
+const setType=t=>{st.type=t;st.main=Object.keys(T[t].m)[0];fix();drawCalc()},setMain=m=>{st.main=m;fix();drawCalc()},setFull=b=>{st.full=b;fix();drawCalc()},
+setKey=(i,k)=>{st.subs[i].key=k;fix();drawCalc()},setInit=(i,v)=>{st.subs[i].init=+v;drawCalc()},
+addRoll=i=>{if(totalUp()<maxUp()){st.subs[i].rolls.push(4);drawCalc()}},delRoll=i=>{st.subs[i].rolls.pop();drawCalc()},
+setRoll=(i,j,v)=>{st.subs[i].rolls[j]=+v;drawCalc()},toggleUse=k=>{st.used.has(k)?st.used.delete(k):st.used.add(k);drawCalc()};
+const typeChips=(cur,fn)=>Object.keys(T).map(t=>`<button class="chip ${t===cur?'on':''}" onclick="${fn}('${t}')">${x(T[t].n)}</button>`).join('');
+
+function drawCalc(){
+ let h=`<div class="box"><h2>${x(['1) เลือกประเภทและออฟหลัก','1) Piece type and main stat'])}</h2><div class="row">${typeChips(st.type,'setType')}</div>
+ <div class="row" style="margin-top:10px"><b>${x(['ออฟหลัก','Main stat'])}</b><select onchange="setMain(this.value)">${Object.keys(T[st.type].m).map(m=>`<option value="${m}" ${m===st.main?'selected':''}>${M[m][0]}</option>`).join('')}</select><span class="mu">Lv.20 = ${M[st.main][1]}</span></div>
+ <div class="row" style="margin-top:10px"><b>${x(['ออฟรองตอนเริ่ม','Starting substats'])}</b><button class="chip ${st.full?'on':''}" onclick="setFull(true)">${x(['ครบ 4 ตั้งแต่แรก','4 from the start'])}</button><button class="chip ${!st.full?'on':''}" onclick="setFull(false)">${x(['เริ่ม 3 (อันที่ 4 มาตอน +4)','3 at start (4th at +4)'])}</button></div></div>`;
+ h+=`<div class="box"><h2>${x(['2) ใส่ค่าออฟรองและการตีบวก','2) Substat values and upgrades'])}</h2><div class="mu">${x(['ตีบวกแล้ว','Upgrades used'])} ${totalUp()}/${maxUp()}</div><div class="grid" style="margin-top:8px">`;
+ const tot={};
+ st.subs.forEach((s,i)=>{const k=s.key;const total=S[k].t[s.init]+s.rolls.reduce((a,r)=>a+val(k,r),0);tot[k]=total;
+  h+=`<div class="sb ${st.used.has(k)?'use':''}"><select onchange="setKey(${i},this.value)">${SK.filter(y=>y!==st.main).map(y=>`<option value="${y}" ${y===k?'selected':''} ${st.subs.some((o,j)=>j!==i&&o.key===y)?'disabled':''}>${S[y].n}</option>`).join('')}</select>
+  <div class="mu" style="margin:5px 0">${x(S[k].d)}</div>
+  <div class="row"><span class="mu">${x(['ค่าเริ่มต้น','Initial'])}</span><select onchange="setInit(${i},this.value)">${S[k].t.map((t,j)=>`<option value="${j}" ${j===s.init?'selected':''}>${fmt(k,t)}</option>`).join('')}</select></div>
+  <div class="rolls">${s.rolls.map((r,j)=>`<select onchange="setRoll(${i},${j},this.value)"><option value="4" ${r===4?'selected':''}>+ ${x(['เฉลี่ย','avg'])} ${S[k].p?avg(k).toFixed(2):Math.round(avg(k))}</option>${S[k].t.map((t,q)=>`<option value="${q}" ${r===q?'selected':''}>+ ${fmt(k,t)}</option>`).join('')}</select>`).join('')}</div>
+  <div class="row"><button class="sm" onclick="addRoll(${i})" ${totalUp()>=maxUp()?'disabled':''}>+ ${x(['ตีบวก','Upgrade'])}</button><button class="sm" onclick="delRoll(${i})" ${s.rolls.length?'':'disabled'}>− ${x(['ลบ','Undo'])}</button><span class="mu">×${s.rolls.length}</span></div>
+  <div style="margin-top:6px"><span class="big">${fmt(k,total)}</span> <span class="mu">RV ${(total/S[k].t[3]*100).toFixed(0)}%</span></div>
+  <label class="mu"><input type="checkbox" ${st.used.has(k)?'checked':''} onchange="toggleUse('${k}')"> ${x(['ตัวละครใช้ค่านี้','Character uses this'])}</label></div>`});
+ h+='</div></div>';
+ const used=st.subs.filter(s=>st.used.has(s.key));
+ const rv=used.reduce((a,s)=>a+tot[s.key]/S[s.key].t[3]*100,0),rolls=used.reduce((a,s)=>a+1+s.rolls.length,0),g=rvG(rv);
+ const hasCV=tot.cr!==undefined&&tot.cd!==undefined&&st.used.has('cr')&&st.used.has('cd'),cv=hasCV?tot.cr*2+tot.cd:0;
+ h+=`<div class="box"><h2>${x(['3) สรุปผล Lv.20','3) Lv.20 summary'])}</h2><div class="tw"><table><tr><td>${x(['ออฟหลัก','Main stat'])} ${M[st.main][0]}</td><td>${M[st.main][1]}</td></tr>`;
+ st.subs.forEach(s=>h+=`<tr><td>${S[s.key].n}${st.used.has(s.key)?' ✓':''}</td><td>${fmt(s.key,tot[s.key])}</td></tr>`);
+ h+=`</table></div><div style="margin-top:12px">${x(['คะแนน RV ของค่าที่ใช้','RV of useful stats'])}: <b>${rv.toFixed(0)}%</b> ${used.length?badge(g):''}</div>
+ <div class="bar"><i style="width:${Math.min(rv/500,1)*100}%;background:var(${GR[g][2]})"></i></div>
+ <div class="mu">${x(['จำนวนการ roll ลงค่าที่ใช้','Rolls landed in useful stats'])}: ${rolls}</div>`;
+ if(hasCV)h+=`<div style="margin-top:8px">Crit Value (CR×2 + CD): <b>${cv.toFixed(1)}</b> ${badge(cvG(cv))}</div>`;
+ h+=`<div class="tip">${x(['RV 100% = เทียบเท่า roll สูงสุด 1 ครั้ง · เกณฑ์ทั่วไป: ต่ำ <150, พอใช้ 150–249, ดี 250–349, ดีมาก 350–449, ยอดเยี่ยม 450+ · Crit Value: <20 ต่ำ, 20–29 พอใช้, 30–39 ดี, 40–49 ดีมาก, 50+ ยอดเยี่ยม (เกณฑ์ของชุมชน ใช้เป็นแนวทางเท่านั้น)','RV 100% equals one maximum-value roll. Rule of thumb: Weak <150, Decent 150–249, Good 250–349, Great 350–449, Excellent 450+. Crit Value: <20 Weak, 20–29 Decent, 30–39 Good, 40–49 Great, 50+ Excellent (community guidelines, for reference only).'])}</div></div>`;
+ $('#p0').innerHTML=h}
+
+/* ---- drop probability ---- */
+const pr={type:'circlet',main:'cr',sel:new Set(['cd','atkp']),start:'any'};
+function calc(main,sel){const keys=SK.filter(k=>k!==main);let tot=0;(function r(ch,rem,d,p){if(d===4){if(sel.every(k=>ch.includes(k)))tot+=p;return}
+ const W=rem.reduce((a,k)=>a+S[k].w,0);for(const k of rem)r([...ch,k],rem.filter(y=>y!==k),d+1,p*S[k].w/W)})([],keys,0,1);return tot}
+const pType=t=>{pr.type=t;pr.main=Object.keys(T[t].m)[0];pr.sel.delete(pr.main);drawProb()},pMain=m=>{pr.main=m;pr.sel.delete(m);drawProb()},
+pSel=k=>{pr.sel.has(k)?pr.sel.delete(k):pr.sel.add(k);drawProb()},pStart=s=>{pr.start=s;drawProb()};
+function drawProb(){
+ const m=T[pr.type].m,W=Object.values(m).reduce((a,b)=>a+b,0),sel=[...pr.sel];
+ let h=`<div class="box"><h2>${x(['ประเภทและออฟหลัก','Piece type and main stat'])}</h2><div class="row">${typeChips(pr.type,'pType')}</div>
+ <div class="row" style="margin-top:10px"><b>${x(['ออฟหลัก','Main stat'])}</b><select onchange="pMain(this.value)">${Object.keys(m).map(k=>`<option value="${k}" ${k===pr.main?'selected':''}>${M[k][0]}</option>`).join('')}</select></div></div>
+ <div class="box"><h2>${x(['ออฟรองที่ต้องการ (สูงสุด 4)','Wanted substats (up to 4)'])}</h2><div class="row">${SK.map(k=>`<button class="chip ${pr.sel.has(k)?'on':''}" ${k===pr.main||(!pr.sel.has(k)&&pr.sel.size>=4)?'disabled':''} onclick="pSel('${k}')">${S[k].n}</button>`).join('')}</div>
+ <div class="row" style="margin-top:10px"><b>${x(['ออฟรองตอนเริ่ม','Starting substats'])}</b>${[['any',['ไม่สนใจ','Any']],['four',['ครบ 4 ตั้งแต่ Lv.1','4 at Lv.1']],['three',['เริ่ม 3','3 at start']]].map(([v,l])=>`<button class="chip ${pr.start===v?'on':''}" onclick="pStart('${v}')">${x(l)}</button>`).join('')}</div></div>`;
+ const pm=m[pr.main]/W,ps=calc(pr.main,sel),pst={any:1,four:.2,three:.8}[pr.start],pt=pm*ps*pst,pa=pt/5;
+ h+=`<div class="box"><div class="mu">${x(['โอกาสต่อ Artifact 1 ชิ้นที่ดรอป (รวมโอกาสได้ประเภทนี้)','Chance per single artifact dropped (including the piece-type roll)'])}</div><div class="res">${pct(pa)}</div>
+ <div>${one(pa)} · ${x(['มีโอกาส 50% ที่จะได้ภายใน','50% chance within'])} ${half(pa)} ${x(['ชิ้น','drops'])}</div>
+ <div class="tw" style="margin-top:10px"><table><tr><td>${x(['ได้ประเภทนี้','Piece type'])}</td><td>20%</td></tr><tr><td>${x(['ได้ออฟหลักนี้','Main stat'])}</td><td>${pct(pm)}</td></tr>
+ <tr><td>${x(['มีออฟรองที่เลือกครบ','Has all wanted substats'])}</td><td>${pct(ps)}</td></tr><tr><td>${x(['เงื่อนไขตอนเริ่ม','Start condition'])}</td><td>${pct(pst)}</td></tr>
+ <tr><td>${x(['ถ้าได้ประเภทนี้แล้ว','Given this piece type'])}</td><td>${pct(pt)} (${one(pt)})</td></tr></table></div>
+ <div class="tip">${x(['รายละเอียดสูตรดูได้ในแท็บ "คำชี้แจง"','See the "Guide" tab for full formulas.'])}</div></div>`;
+ $('#p1').innerHTML=h}
+
+/* ---- guide ---- */
+function drawGuide(){
+ const wsum=SK.reduce((a,k)=>a+S[k].w,0);
+ const ex=calc('cr',['cd','atkp']),exm=10/100;
+ let h=`<div class="box"><h2>${x(['คำชี้แจงและวิธีคำนวณ','Guide and calculation details'])}</h2>
+ <div class="tip">${x(['ข้อมูลทั้งหมดเป็นของ Artifact 5 ดาว และอิงข้อมูลที่ชุมชนเก็บรวบรวม ตัวเลขอาจเปลี่ยนตามอัปเดตเกม','All data is for 5-star artifacts and based on community-gathered data. Numbers may change with game updates.'])}</div>
+ <h3>${x(['1. ค่าออฟรองแต่ละระดับ (ต่อ 1 roll)','1. Substat values per roll'])}</h3>
+ <p>${x(['ทุกครั้งที่ออฟรองถูก roll จะได้ค่าหนึ่งใน 4 ระดับ โอกาสเท่ากัน ระดับละ 25% ค่าเฉลี่ยคือผลรวม 4 ค่า ÷ 4','Each roll gives one of 4 tiers, each with 25% chance. The average is the sum of the 4 values ÷ 4.'])}</p>
+ <div class="tw"><table><tr><th>${x(['ออฟ','Stat'])}</th><th>T1</th><th>T2</th><th>T3</th><th>T4 (${x(['สูงสุด','max'])})</th></tr>${SK.map(k=>`<tr><td>${S[k].n}</td>${S[k].t.map(v=>`<td>${S[k].p?v.toFixed(2)+'%':v}</td>`).join('')}</tr>`).join('')}</table></div>
+ <h3>${x(['2. การตีบวกและค่า Lv.20','2. Upgrades and Lv.20 values'])}</h3>
+ <ul><li>${x(['Artifact ได้รับการเพิ่มออฟรองทุก 4 เลเวล: +4, +8, +12, +16, +20 รวม 5 ครั้ง','An upgrade event happens every 4 levels: +4, +8, +12, +16, +20 (5 events in total).'])}</li>
+ <li>${x(['เริ่มด้วย 4 ออฟรอง: ทั้ง 5 ครั้งสุ่มเลือกออฟรองหนึ่งในสี่ (25%) แล้วบวกค่าหนึ่งระดับ','Starting with 4 substats: each of the 5 events picks one of the four substats (25% each) and adds a random tier.'])}</li>
+ <li>${x(['เริ่มด้วย 3 ออฟรอง: ครั้งที่ +4 จะเพิ่มออฟรองตัวที่ 4 ใหม่ (ไม่ใช่การบวก) ที่เหลืออีก 4 ครั้งเป็นการบวกปกติ จึงใช้ตีบวกได้ 4 ครั้ง','Starting with 3 substats: the +4 event adds a new 4th substat (not an upgrade); the remaining 4 events are normal upgrades, so 4 upgrades are available.'])}</li></ul>
+ <div class="fm">${x(['ค่าสุดท้าย = ค่าเริ่มต้น + ผลรวมของค่าที่บวกทุกครั้ง','Final value = initial value + sum of every upgrade roll'])}</div>
+ <p>${x(['เมื่อไม่ทราบค่าที่เด้งจริง เครื่องมือใช้ "ค่าเฉลี่ย" ซึ่งเป็นค่ากลางของ 4 ระดับ','When the exact rolled value is unknown, the tool uses the "average" of the 4 tiers.'])}</p>
+ <h3>${x(['3. ค่าออฟหลักที่ Lv.20','3. Main stat at Lv.20'])}</h3>
+ <p>${Object.keys(M).map(k=>`${M[k][0]} <b>${M[k][1]}</b>`).join(' · ')}</p>
+ <h3>${x(['4. คะแนน RV, Crit Value และเกณฑ์','4. RV, Crit Value and grades'])}</h3>
+ <div class="fm">RV = ${x(['ค่าออฟที่ได้ ÷ ค่า roll สูงสุดของออฟนั้น × 100%','stat total ÷ max single-roll value × 100%'])}<br>Crit Value = CRIT Rate × 2 + CRIT DMG</div>
+ <p>${x(['RV รวมจะนับเฉพาะออฟที่ติ๊ก "ตัวละครใช้ค่านี้" ตัวอย่าง: ATK% ที่ได้ 11.7% ÷ 5.83% = 200%','Total RV counts only stats ticked as "Character uses this". Example: ATK% of 11.7% ÷ 5.83% = 200%.'])}</p>
+ <div class="tw"><table><tr><th>${x(['ระดับ','Grade'])}</th><th>RV</th><th>Crit Value</th></tr>${[['<150','<20'],['150–249','20–29'],['250–349','30–39'],['350–449','40–49'],['450+','50+']].map((r,i)=>`<tr><td>${badge(i)}</td><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table></div>
+ <p class="mu">${x(['เป็นแนวทางทั่วไปสำหรับมือใหม่ ไม่ใช่กฎตายตัว: ตัวละครและบิลด์ต่างกันต้องการไม่เหมือนกัน','A general rule of thumb for beginners, not a hard rule: different characters and builds need different things.'])}</p>
+ <h3>${x(['5. อัตราการดรอป','5. Drop rates'])}</h3>
+ <ul><li>${x(['ประเภท: ทั้ง 5 ประเภทมีโอกาสเท่ากัน ประเภทละ 1/5 = 20%','Piece type: all 5 types are equally likely, 1/5 = 20% each.'])}</li>
+ <li>${x(['ออฟหลัก: ดูน้ำหนักด้านล่าง โอกาส = น้ำหนักของออฟนั้น ÷ ผลรวมน้ำหนักของประเภท (ดอกไม้และขนนกคงที่ 100%)','Main stat: see weights below. Chance = that stat weight ÷ total weight for the type (Flower and Plume are fixed at 100%).'])}</li>
+ <li>${x(['จำนวนออฟรองตอนเริ่ม: 4 ออฟ = 20%, 3 ออฟ = 80%','Starting substats: 4 substats = 20%, 3 substats = 80%.'])}</li></ul>
+ <div class="tw"><table><tr><th>${x(['ประเภท','Type'])}</th><th>${x(['ออฟหลัก : โอกาส','Main stat : chance'])}</th></tr>${Object.keys(T).map(t=>{const W=Object.values(T[t].m).reduce((a,b)=>a+b,0);return`<tr><td>${x(T[t].n)}</td><td style="text-align:left">${Object.keys(T[t].m).map(k=>`${M[k][0]} ${(T[t].m[k]/W*100).toFixed(2)}%`).join(' · ')}</td></tr>`}).join('')}</table></div>
+ <p style="margin-top:10px">${x(['ออฟรอง: แต่ละออฟมีน้ำหนักการสุ่มดังนี้ (ออฟที่ซ้ำกับออฟหลักจะไม่ถูกสุ่ม)','Substats: each stat has a selection weight as follows (a stat equal to the main stat is excluded).'])}</p>
+ <div class="tw"><table><tr><th>${x(['ออฟ','Stat'])}</th><th>${x(['น้ำหนัก','Weight'])}</th><th>${x(['สัดส่วนเมื่อไม่ตัดออก','Share if none excluded'])}</th></tr>${SK.map(k=>`<tr><td>${S[k].n}</td><td>${S[k].w}</td><td>${(S[k].w/wsum*100).toFixed(1)}%</td></tr>`).join('')}</table></div>
+ <p>${x(['ออฟรองสุ่มทีละตัวโดยไม่ซ้ำ ตามน้ำหนักของตัวที่เหลือ ทั้งแบบเริ่ม 4 และเริ่ม 3 (ตัวที่ 4 สุ่มจากตัวที่เหลือตอน +4) ผลคือชุดออฟรอง 4 ตัวสุดท้ายมีการแจกแจงเหมือนกัน เงื่อนไขการเริ่มต้นจึงเป็นเพียงตัวคูณ 20% หรือ 80%','Substats are drawn one by one without repeats, weighted among the remaining stats. This holds both for 4-at-start and 3-at-start (the 4th is drawn from the remaining stats at +4), so the final set of 4 substats has the same distribution either way. The start condition is therefore just a 20% or 80% multiplier.'])}</p>
+ <div class="fm">P(${x(['ได้ชิ้นที่ต้องการ','target piece'])}) = 1/5 × P(main) × P(${x(['มีออฟรองครบ','has wanted substats'])}) × P(${x(['เงื่อนไขเริ่ม','start'])})<br>P(${x(['มีออฟรองครบ','has wanted substats'])}) = Σ ${x(['ของทุกลำดับการสุ่ม 4 ตัวที่มีออฟที่ต้องการครบ','over every ordered 4-stat draw containing all wanted stats'])} ∏ w<sub>i</sub> ÷ ${x(['ผลรวมน้ำหนักที่เหลือ','remaining total weight'])}</div>
+ <p><b>${x(['ตัวอย่าง','Example'])}:</b> ${x(['มงกุฎ ออฟหลัก CRIT Rate ต้องการ CRIT DMG + ATK% โดยไม่สนใจการเริ่มต้น','Circlet with CRIT Rate main, wanting CRIT DMG + ATK%, any start'])}<br>
+ 1/5 × ${pct(exm)} × ${pct(ex)} = <b>${pct(.2*exm*ex)}</b> (${one(.2*exm*ex)})</p>
+ <h3>${x(['6. ข้อจำกัด','6. Limitations'])}</h3>
+ <ul><li>${x(['ไม่รวม Artifact 4 ดาวหรือต่ำกว่า และไม่รวมกรณีที่เซ็ตมีเงื่อนไขพิเศษ','4-star and lower rarities and special drop conditions are not covered.'])}</li>
+ <li>${x(['ความน่าจะเป็นนับเฉพาะ "ชนิดของออฟรอง" ไม่รวมโอกาสที่การตีบวกจะเด้งลงออฟไหนหรือได้ค่าระดับใด','Probabilities cover only which substats appear, not where upgrades land or which tier they roll.'])}</li>
+ <li>${x(['ค่าในเกมแสดงเป็นเลขปัดเศษ ผลรวมในเครื่องมืออาจต่างจากในเกมประมาณ 0.1','The game shows rounded numbers, so totals here may differ from in-game by about 0.1.'])}</li></ul></div>`;
+ $('#p2').innerHTML=h}
+
+/* ---- shell ---- */
+function tab(n){TB=n;[0,1,2].forEach(i=>{$('#p'+i).hidden=i!==n;$('#t'+i).classList.toggle('on',i===n)})}
+function setLang(i){LI=i;try{localStorage.setItem('lang',i?'en':'th')}catch(e){}paint()}
+function paint(){document.documentElement.lang=LI?'en':'th';$('#lth').classList.toggle('on',!LI);$('#len').classList.toggle('on',!!LI);
+ $('#h1').textContent=x(['เครื่องคิดเลข Artifact Genshin Impact','Genshin Impact Artifact Calculator']);$('#hp').textContent=x(['คำนวณสถิติ Lv.20 และโอกาสดรอปของ Artifact 5 ดาว','Lv.20 stats and drop chances for 5-star artifacts']);
+ ['คำนวณสถิติ|Stat calculator','โอกาสดรอป|Drop chance','คำชี้แจง|Guide'].forEach((s,i)=>$('#t'+i).textContent=s.split('|')[LI]);
+ drawCalc();drawProb();drawGuide();tab(TB)}
+fix();paint();
+</script>
+</body>
+</html>
